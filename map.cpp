@@ -1,8 +1,10 @@
 #include "math.h"
+#include <SFML/Graphics.hpp>
 #include <cmath>
 #include <codecvt>
 #include <cstdlib>
 #include <iostream>
+#include <ostream>
 #include <random>
 #include <vector>
 
@@ -58,25 +60,19 @@ std::vector<std::vector<int>> backtrackMaze(int width, int height) {
 }
 
 std::vector<std::vector<int>>
-checkNeighbors(const std::vector<std::vector<int>> &maze, int i, int j) {
+checkNeighbors(const std::vector<std::vector<int>> &maze, int cRow, int cCol) {
   std::vector<std::vector<int>> neighbors;
+
+  int rowDirection[4] = {-2, 2, 0, 0};
+  int colDirection[4] = {0, 0, 2, -2};
+
   for (int i = 0; i < 4; i++) {
-    std::vector<int> temp = {i, j};
+    int row = cRow + rowDirection[i];
+    int col = cCol + colDirection[i];
 
-    int offset;
-    int upperPart = std::floor(i / 2) * 2;
-    int lowerPart = -2;
-    if (upperPart == 0)
-      offset = lowerPart;
-
-    temp[i & 2] += offset;
-    int row = temp[0];
-    int col = temp[0];
-
-    if (row < (int)maze.size() && col < (int)maze[0].size() && row > 0 &&
-        col > 0) {
+    if (row < maze.size() && col < maze[i].size() && row >= 0 && col >= 0) {
       if (maze[row][col] == 1)
-        neighbors.push_back(temp);
+        neighbors.push_back({row, col});
     }
   }
   return neighbors;
@@ -84,7 +80,33 @@ checkNeighbors(const std::vector<std::vector<int>> &maze, int i, int j) {
 
 int main() {
 
-  std::cout << "testing masi nanya login gak";
+  int width = 100;
+  int height = 100;
 
+  std::vector<std::vector<int>> finalMaze = backtrackMaze(width, height);
+  sf::RenderWindow window(sf::VideoMode(800, 800), "Maze");
+
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      if (event.type == sf::Event::Closed)
+        window.close();
+    }
+
+    window.clear(sf::Color::White);
+
+    float cellSize = 20.0f;
+    for (int i = 0; i < finalMaze.size(); i++) {
+      for (int j = 0; j < finalMaze[i].size(); j++) {
+        if (finalMaze[i][j] == 1) {
+          sf::RectangleShape wall(sf::Vector2f(cellSize, cellSize));
+          wall.setPosition(j * cellSize, i * cellSize);
+          wall.setFillColor(sf::Color::Black);
+          window.draw(wall);
+        }
+      }
+    }
+    window.display();
+  }
   return 0;
 }
