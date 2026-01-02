@@ -82,4 +82,9 @@ checkNeighbors(const std::vector<std::vector<int>> &maze, int i, int j) {
   return neighbors;
 }
 
-int main() { return 0; }
+int main() {
+
+  std::cout << "testing masi nanya login gak";
+
+  return 0;
+}
